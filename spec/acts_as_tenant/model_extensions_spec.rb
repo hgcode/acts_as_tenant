@@ -297,6 +297,22 @@ describe ActsAsTenant do
     end
   end
 
+  # Tenant required with Except
+  context "tenant required with except" do
+    describe "raises exception if no tenant specified and no exception for except class" do
+      before do
+        @account1 = Account.create!(:name => 'foo')
+        @project1 = @account1.projects.create!(:name => 'foobar')
+        allow(ActsAsTenant.configuration).to receive_messages(require_tenant: true, require_tenant_except: ["Task"])
+      end
+
+      it "should raise an error when no tenant is provided but exclude one class" do
+        expect { Project.all.load }.to raise_error(ActsAsTenant::Errors::NoTenantSet)
+        expect { Task.all.load }.to_not raise_error(ActsAsTenant::Errors::NoTenantSet)
+      end
+    end
+  end
+
   context "no tenant required" do
     describe "does not raise exception if no tenant specified" do
       before do

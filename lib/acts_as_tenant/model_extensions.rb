@@ -55,7 +55,7 @@ module ActsAsTenant
 
         default_scope lambda {
           if ActsAsTenant.configuration.require_tenant && ActsAsTenant.current_tenant.nil?
-            raise ActsAsTenant::Errors::NoTenantSet
+            raise ActsAsTenant::Errors::NoTenantSet unless ActsAsTenant.configuration.require_tenant_except.include?(self.name)
           end
           if ActsAsTenant.current_tenant
             where(fkey.to_sym => ActsAsTenant.current_tenant.id)
